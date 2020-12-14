@@ -15,14 +15,14 @@ import gdal
 import json
 from PIL import Image
 import logging
-
+DATA_PATH = '../'
 CUR_PATH = r'./'
-TIF_PATH = os.path.join(CUR_PATH, r'tif_and_shp/CJ2.tif')
-SHP_PATH = os.path.join(CUR_PATH, r'tif_and_shp/point/Correction.shp')
+TIF_PATH = os.path.join(DATA_PATH, r'tif_and_shp/CJ2.tif')
+SHP_PATH = os.path.join(DATA_PATH, r'tif_and_shp/point_road/Correction.shp')
 TRAIN_NAME = r'train_road_faster_rcnn'
 TRAIN_PATH = os.path.join(CUR_PATH, TRAIN_NAME)
 CROP_SIZE = 400
-ROAD_WINDOW_SIZE = 64
+ROAD_WINDOW_SIZE = 100
 VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
 IMAGE_NUM = 0
 ALL_IMAGE_NUM = 1000
@@ -149,7 +149,7 @@ class SHP_HANDLE(object):
             if raster_name == None: continue
             sample_path_name = os.path.join(save_path, raster_name)
             sample_xyc = "{},{},{},{},{}".format(int(x_df - self.road_window_size / 2), int(y_df - self.road_window_size / 2),
-                                  int(x_df + self.road_window_size / 2),int(y_df + self.road_window_size / 2), 1)
+                                  int(x_df + self.road_window_size / 2),int(y_df + self.road_window_size / 2), 0)
             sample = "{} {}".format(sample_path_name, sample_xyc)
             self.train_samples.append(sample)
         with open(train_out_path, 'w') as f:

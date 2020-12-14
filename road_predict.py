@@ -7,7 +7,9 @@ from PIL import Image
 frcnn = FRCNN()
 
 while True:
-    img = input('Input image filename:')
+    img = r'train_road_faster_rcnn/0_3899_4084.jpg'
+    # img = input('Input image filename:')
+
     try:
         image = Image.open(img)
     except:

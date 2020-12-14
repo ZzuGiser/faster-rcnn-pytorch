@@ -3,6 +3,7 @@ logs/
 *.h5
 *.pth
 images/
+road_images/
 result/
 tif_and_shp/
 train_road_faster_rcnn/

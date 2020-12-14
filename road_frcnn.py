@@ -23,9 +23,9 @@ from utils.utils import DecodeBox, loc2bbox, nms
 #--------------------------------------------#
 class FRCNN(object):
     _defaults = {
-        "model_path"    : 'logs/Epoch100-Total_Loss0.1463-Val_Loss0.2307.pth',
+        "model_path"    : 'logs/Epoch99-Total_Loss0.1821-Val_Loss0.3595.pth',
         "classes_path"  : 'model_data/road_voc_classes.txt',
-        "confidence"    : 0.5,
+        "confidence"    : 0.9,
         "iou"           : 0.3,
         "backbone"      : "resnet50",
         "cuda"          : True,
@@ -171,3 +171,84 @@ class FRCNN(object):
         
         print("time:",time.time()-start_time)
         return image
+
+    def batch_detect_image(self, image,out_path,img_name):
+        with torch.no_grad():
+            start_time = time.time()
+            image_shape = np.array(np.shape(image)[0:2])
+            old_width = image_shape[1]
+            old_height = image_shape[0]
+            old_image = copy.deepcopy(image)
+            width, height = get_new_img_size(old_width, old_height)
+
+            image = image.resize([width, height], Image.BICUBIC)
+            photo = np.array(image, dtype=np.float32) / 255
+            photo = np.transpose(photo, (2, 0, 1))
+
+            images = []
+            images.append(photo)
+            images = np.asarray(images)
+            images = torch.from_numpy(images)
+            if self.cuda:
+                images = images.cuda()
+
+            roi_cls_locs, roi_scores, rois, roi_indices = self.model(images)
+            decodebox = DecodeBox(self.std, self.mean, self.num_classes)
+            outputs = decodebox.forward(roi_cls_locs, roi_scores, rois, height=height, width=width, nms_iou=self.iou,
+                                        score_thresh=self.confidence)
+            if len(outputs) == 0:
+                return old_image
+            bbox = outputs[:, :4]
+            conf = outputs[:, 4]
+            label = outputs[:, 5]
+
+            bbox[:, 0::2] = (bbox[:, 0::2]) / width * old_width
+            bbox[:, 1::2] = (bbox[:, 1::2]) / height * old_height
+            bbox = np.array(bbox, np.int32)
+
+        image = old_image
+        thickness = (np.shape(old_image)[0] + np.shape(old_image)[1]) // old_width * 2
+        font = ImageFont.truetype(font='model_data/simhei.ttf',
+                                  size=np.floor(3e-2 * np.shape(image)[1] + 0.5).astype('int32'))
+        rectangles_xy =[]
+        for i, c in enumerate(label):
+            predicted_class = self.class_names[int(c)]
+            score = conf[i]
+
+            left, top, right, bottom = bbox[i]
+            top = top - 5
+            left = left - 5
+            bottom = bottom + 5
+            right = right + 5
+
+            top = max(0, np.floor(top + 0.5).astype('int32'))
+            left = max(0, np.floor(left + 0.5).astype('int32'))
+            bottom = min(np.shape(image)[0], np.floor(bottom + 0.5).astype('int32'))
+            right = min(np.shape(image)[1], np.floor(right + 0.5).astype('int32'))
+            rectangles_xy.append([left, top, right, bottom])
+            # 画框框
+            label = '{} {:.2f}'.format(predicted_class, score)
+            draw = ImageDraw.Draw(image)
+            label_size = draw.textsize(label, font)
+            label = label.encode('utf-8')
+            print(label)
+
+            if top - label_size[1] >= 0:
+                text_origin = np.array([left, top - label_size[1]])
+            else:
+                text_origin = np.array([left, top + 1])
+
+            for i in range(thickness):
+                draw.rectangle(
+                    [left + i, top + i, right - i, bottom - i],
+                    outline=self.colors[int(c)])
+            draw.rectangle(
+                [tuple(text_origin), tuple(text_origin + label_size)],
+                fill=self.colors[int(c)])
+            draw.text(text_origin, str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
+            del draw
+
+        print("time:", time.time() - start_time)
+        image_path = os.path.join(out_path,img_name)
+        image.save(image_path)
+        return rectangles_xy
