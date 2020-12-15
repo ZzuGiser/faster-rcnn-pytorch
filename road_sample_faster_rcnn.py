@@ -4,6 +4,7 @@
 # @Author: shao
 # @Date  : 2020/11/3
 # @Desc  :
+import random
 
 import geopandas as gpd
 from matplotlib import pyplot as plt
@@ -15,6 +16,7 @@ import gdal
 import json
 from PIL import Image
 import logging
+
 DATA_PATH = '../'
 CUR_PATH = r'./'
 TIF_PATH = os.path.join(DATA_PATH, r'tif_and_shp/CJ2.tif')
@@ -25,7 +27,7 @@ CROP_SIZE = 400
 ROAD_WINDOW_SIZE = 100
 VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
 IMAGE_NUM = 0
-ALL_IMAGE_NUM = 1000
+ALL_IMAGE_NUM = 100
 
 
 class TIF_TRANS(object):
@@ -89,7 +91,7 @@ class TIF_HANDLE(object):
             im = Image.fromarray(im).convert('RGB')
         im.save(path)
 
-    def tif_crop(self, crop_size, x, y, x_df, y_df):
+    def tif_crop(self, crop_size, x, y):
         sava_path = self.save_path
         dataset_img = self.dataset
         width = dataset_img.RasterXSize
@@ -99,8 +101,9 @@ class TIF_HANDLE(object):
         #  获取当前文件夹的文件个数len,并以len+1命名即将裁剪得到的图像
         new_name = '{}_{}_{}.jpg'.format(self.image_num, int(x), int(y))
         #  裁剪图片,重复率为RepetitionRate
-        x_min, x_max = x - x_df, x + crop_size - x_df
-        y_min, y_max = y - y_df, y + crop_size - y_df
+        crop_len = int(crop_size/2)
+        x_min, x_max = x - crop_len, x + crop_size - crop_len
+        y_min, y_max = y - crop_len, y + crop_size - crop_len
 
         if (len(img.shape) == 2):
             cropped = img[int(y_min): int(y_max), int(x_min): int(x_max)]
@@ -117,6 +120,8 @@ class TIF_HANDLE(object):
             return None
 
         try:
+            color = int(np.sum(cropped) / (crop_size * crop_size))
+            if color < 70: return None
             self.writeTiff(cropped, os.path.join(sava_path, new_name))
             self.image_num += 1
             logging.info('crop image name:{}'.format(new_name))
@@ -144,12 +149,17 @@ class SHP_HANDLE(object):
             if i > self.samples_num:
                 break
             row, col = tif_tran.geo2imagexy(geo.centroid.x, geo.centroid.y)
+            x_offest, y_offest = random.randint(-100, 100), random.randint(-100, 100)
+            # x_offest, y_offest = 100, 100
             x_df, y_df = int(crop_size / 2), int(crop_size / 2)
-            raster_name = tif_handle.tif_crop(crop_size, row, col, x_df, y_df)
+            x, y = int(x_df - x_offest), int(y_df - y_offest)
+            row, col = row + x_offest, col + y_offest
+            raster_name = tif_handle.tif_crop(crop_size, row, col)
             if raster_name == None: continue
+            road_size = random.randint(self.road_window_size, int(self.road_window_size * 1.5))
             sample_path_name = os.path.join(save_path, raster_name)
-            sample_xyc = "{},{},{},{},{}".format(int(x_df - self.road_window_size / 2), int(y_df - self.road_window_size / 2),
-                                  int(x_df + self.road_window_size / 2),int(y_df + self.road_window_size / 2), 0)
+            sample_xyc = "{},{},{},{},{}".format(int(x - road_size / 2), int(y - road_size / 2),
+                                                 int(x + road_size / 2), int(y + road_size / 2), 0)
             sample = "{} {}".format(sample_path_name, sample_xyc)
             self.train_samples.append(sample)
         with open(train_out_path, 'w') as f:

@@ -1,0 +1,49 @@
+./road_val_data/photo/0_408_5713.jpg 174,151,280,232,0
+./road_val_data/photo/10_8574_10499.jpg 152,159,239,241,0
+./road_val_data/photo/11_11827_9316.jpg 148,111,243,187,0
+./road_val_data/photo/12_15186_6243.jpg 181,150,303,264,0
+./road_val_data/photo/13_7492_14679.jpg 165,159,249,244,0
+./road_val_data/photo/14_17121_12475.jpg 145,169,206,233,0 186,136,256,202,0 294,35,378,127,0 35,254,117,342,0
+./road_val_data/photo/15_10339_4337.jpg 142,46,241,114,0 168,178,229,230,0 154,300,237,365,0
+./road_val_data/photo/17_2341_5935.jpg 7,253,66,314,0
+./road_val_data/photo/20_17971_3772.jpg 160,168,231,263,0
+./road_val_data/photo/22_6681_5709.jpg 157,171,250,265,0
+./road_val_data/photo/23_17077_15633.jpg 154,172,249,266,0
+./road_val_data/photo/24_17420_15166.jpg 173,167,241,230,0
+./road_val_data/photo/25_7531_14194.jpg 177,142,260,208,0
+./road_val_data/photo/28_12743_2485.jpg 172,174,247,240,0
+./road_val_data/photo/29_10639_1571.jpg 325,138,390,196,0
+./road_val_data/photo/2_6515_762.jpg 153,155,248,240,0 17,229,107,290,0
+./road_val_data/photo/31_10238_1553.jpg 156,150,244,230,0
+./road_val_data/photo/32_10071_4319.jpg 160,46,229,106,0 168,170,240,234,0 168,279,240,344,0
+./road_val_data/photo/34_9124_4481.jpg 179,163,282,249,0
+./road_val_data/photo/37_719_3654.jpg 18,138,96,202,0
+./road_val_data/photo/38_4219_8224.jpg 165,166,239,240,0
+./road_val_data/photo/39_4659_8337.jpg 161,174,239,240,0
+./road_val_data/photo/3_7043_13878.jpg 138,150,234,226,0 318,195,384,259,0
+./road_val_data/photo/40_14860_3950.jpg 156,160,247,249,0
+./road_val_data/photo/41_3967_6010.jpg 144,161,225,232,0 130,276,194,337,0
+./road_val_data/photo/42_4866_2171.jpg 325,75,394,149,0
+./road_val_data/photo/43_1460_5367.jpg 59,201,144,279,0
+./road_val_data/photo/45_3246_8579.jpg 149,158,248,244,0
+./road_val_data/photo/48_5303_12314.jpg 176,173,222,222,0
+./road_val_data/photo/49_7170_5887.jpg 182,168,247,229,0
+./road_val_data/photo/4_8126_4018.jpg 161,171,243,235,0
+./road_val_data/photo/50_8045_5695.jpg 278,153,358,248,0
+./road_val_data/photo/51_10614_3295.jpg 147,155,234,244,0
+./road_val_data/photo/52_15236_6244.jpg 138,144,238,247,0
+./road_val_data/photo/53_8661_8453.jpg 159,160,238,242,0
+./road_val_data/photo/54_12028_5528.jpg 151,159,236,253,0
+./road_val_data/photo/56_7258_221.jpg 175,162,269,243,0
+./road_val_data/photo/57_989_1443.jpg 147,198,244,289,0
+./road_val_data/photo/58_9234_7595.jpg 286,184,364,262,0
+./road_val_data/photo/59_16625_12411.jpg 249,249,356,359,0
+./road_val_data/photo/5_15313_10899.jpg 161,154,234,239,0 305,40,386,117,0 48,265,132,338,0
+./road_val_data/photo/61_9835_3029.jpg
+./road_val_data/photo/62_22573_12410.jpg 190,167,274,243,0
+./road_val_data/photo/63_17941_4759.jpg 168,166,243,241,0 84,178,137,228,0
+./road_val_data/photo/64_15975_2596.jpg 160,173,225,231,0
+./road_val_data/photo/6_21948_6629.jpg 279,251,329,310,0
+./road_val_data/photo/7_3015_3014.jpg 152,153,251,248,0
+./road_val_data/photo/8_7024_13835.jpg 162,176,255,267,0
+./road_val_data/photo/9_19869_4510.jpg 242,223,338,343,0
