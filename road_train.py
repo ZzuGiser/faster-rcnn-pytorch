@@ -89,8 +89,8 @@ def fit_ont_epoch(net, epoch, epoch_size, epoch_size_val, gen, genval, Epoch, cu
 
 if __name__ == "__main__":
     # 参数初始化
-    # annotation_path = 'train_road_faster_rcnn/faster_rcnn_road_sample.txt'
-    annotation_path = 'road_train.txt'
+    annotation_path = 'train_road_faster_rcnn/faster_rcnn_road_sample.txt'
+    # annotation_path = 'road_train.txt'
     NUM_CLASSES = 1
     IMAGE_SHAPE = [400, 400, 3]
     BACKBONE = "resnet50"
