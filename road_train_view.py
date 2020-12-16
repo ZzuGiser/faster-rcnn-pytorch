@@ -30,10 +30,9 @@ class Train_Data_View(object):
                     print(e)
 
 
-
 if __name__ == '__main__':
     train_view_name = '{:%Y%m%d_%H%M}_road_view'.format(datetime.datetime.now())
     out_path = os.path.join(TRAIN_VIEW_OUTPUT_PATH, train_view_name)
     txt_path = TRAIN_TXT_PATH
-    train_data_view = Train_Data_View(txt_path=txt_path,output=out_path)
+    train_data_view = Train_Data_View(txt_path=txt_path, output=out_path)
     train_data_view.view()
