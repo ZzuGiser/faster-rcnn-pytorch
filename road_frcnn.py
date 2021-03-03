@@ -23,7 +23,7 @@ from utils.utils import DecodeBox, loc2bbox, nms
 #--------------------------------------------#
 class FRCNN(object):
     _defaults = {
-        "model_path"    : 'logs/Epoch99-Total_Loss0.1821-Val_Loss0.3595.pth',
+        "model_path"    : 'logs/road_voc_weights_resnet.pth',
         "classes_path"  : 'model_data/road_voc_classes.txt',
         "confidence"    : 0.9,
         "iou"           : 0.3,

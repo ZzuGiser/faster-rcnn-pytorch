@@ -27,7 +27,7 @@ CROP_SIZE = 400
 ROAD_WINDOW_SIZE = 100
 VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
 IMAGE_NUM = 0
-ALL_IMAGE_NUM = 100
+ALL_IMAGE_NUM = 1000
 
 
 class TIF_TRANS(object):

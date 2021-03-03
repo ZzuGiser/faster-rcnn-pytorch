@@ -80,6 +80,7 @@ class Patch_Verify(object):
             img_path = os.path.join(images_path, image_name)
             # image = Image.open(imgpath).convert('RGB')
             image = Image.open(img_path)
+            image = image.convert('RGB')
             # image = skimage.io.imread(img_path)
             # if len(image.shape) == 2:
             #     image = image[:, :, np.newaxis]
@@ -88,8 +89,8 @@ class Patch_Verify(object):
             results = self.fcnn.batch_detect_image(image,self.ouput_path,image_name)
             # Visualize results
             dis, offset_xy = self.center_point(results, w, h)
-            m = re.match(r'(\d+)_(\d+)_(\d+).jpg', image_name)
-            row_point, col_point = int(m.group(2)), int(m.group(3))
+            m = re.match(r'(\d+)_(\d+)_(\d+)_(\d+).jpg', image_name)
+            row_point, col_point = int(m.group(3)), int(m.group(4))
             x_before, y_before = tif_tans.imagexy2geo(col_point, row_point)
             x_after, y_after = tif_tans.imagexy2geo(col_point + offset_xy[1], row_point + offset_xy[0])
             temp = [offset_xy[0], offset_xy[1], dis, x_before, y_before, x_after, y_after, img_path]
