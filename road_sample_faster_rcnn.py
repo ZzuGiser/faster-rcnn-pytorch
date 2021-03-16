@@ -17,10 +17,10 @@ import json
 from PIL import Image
 import logging
 
-DATA_PATH = '../'
+DATA_PATH = '/media/two218/data/shao/data/shanghai'
 CUR_PATH = r'./'
-TIF_PATH = os.path.join(DATA_PATH, r'tif_and_shp/CJ2.tif')
-SHP_PATH = os.path.join(DATA_PATH, r'tif_and_shp/point_road/Correction.shp')
+TIF_PATH = os.path.join(DATA_PATH, r'img/GF2_shanghai.tif')
+SHP_PATH = os.path.join(DATA_PATH, r'shp/point_intersection.shp')
 TRAIN_NAME = r'train_road_faster_rcnn'
 TRAIN_PATH = os.path.join(CUR_PATH, TRAIN_NAME)
 CROP_SIZE = 400
