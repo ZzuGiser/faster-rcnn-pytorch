@@ -15,19 +15,27 @@ import os
 import gdal
 import json
 from PIL import Image
-import logging
 
-DATA_PATH = '/media/two218/data/shao/data/shanghai'
+from PIL import ImageEnhance
+import logging
+import yaml
+
+with open('./config.yaml', 'r', encoding='utf-8') as fr:
+    cont = fr.read()
+    config_list = yaml.load(cont)
+DATA_PATH = config_list['data_path']
+SHP_PATH = os.path.join(DATA_PATH, 'shp', config_list['ponint_shp_name'])
+TIF_PATH = os.path.join(DATA_PATH, 'img', config_list['img_name'])
+
 CUR_PATH = r'./'
-TIF_PATH = os.path.join(DATA_PATH, r'img/GF2_shanghai.tif')
-SHP_PATH = os.path.join(DATA_PATH, r'shp/point_intersection.shp')
 TRAIN_NAME = r'train_road_faster_rcnn'
 TRAIN_PATH = os.path.join(CUR_PATH, TRAIN_NAME)
-CROP_SIZE = 400
-ROAD_WINDOW_SIZE = 100
+
+CROP_SIZE = 200
+ROAD_WINDOW_SIZE = 50
 VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
 IMAGE_NUM = 0
-ALL_IMAGE_NUM = 1000
+ALL_IMAGE_NUM = 2000
 
 
 class TIF_TRANS(object):
@@ -63,11 +71,11 @@ class TIF_TRANS(object):
 
 
 class TIF_HANDLE(object):
-    def __init__(self, path=TIF_PATH, save_path=TRAIN_PATH, image_num=IMAGE_NUM):
+    def __init__(self, path=TIF_PATH, save_path=TRAIN_PATH):
         self.tif_path = path
         self.dataset = self.readTif(path)
         self.save_path = save_path
-        self.image_num = image_num
+        self.image_num = IMAGE_NUM
 
     #  读取tif数据集
     def readTif(self, fileName):
@@ -89,9 +97,17 @@ class TIF_HANDLE(object):
                 (im_data[0, :, :, np.newaxis], im_data[1, :, :, np.newaxis], im_data[2, :, :, np.newaxis]), axis=2)
             im = im.astype(np.uint8)
             im = Image.fromarray(im).convert('RGB')
+            im = ImageEnhance.Contrast(im)
+            im = im.enhance(1.5)
         im.save(path)
 
-    def tif_crop(self, crop_size, x, y):
+    def tif_crop(self, crop_size, row, col, x_offest, y_offest):
+        x_df, y_df = int(crop_size / 2), int(crop_size / 2)
+        p_x, p_y = int(x_df - x_offest), int(y_df - y_offest)
+        new_name = '{}_{}_{}_{}_{}.jpg'.format(self.image_num, int(row), int(col), p_x, p_y)
+
+        row, col = row + x_offest, col + y_offest
+
         sava_path = self.save_path
         dataset_img = self.dataset
         width = dataset_img.RasterXSize
@@ -99,11 +115,10 @@ class TIF_HANDLE(object):
         img = dataset_img.ReadAsArray(0, 0, width, height)  # 获取数据
 
         #  获取当前文件夹的文件个数len,并以len+1命名即将裁剪得到的图像
-        new_name = '{}_{}_{}.jpg'.format(self.image_num, int(x), int(y))
         #  裁剪图片,重复率为RepetitionRate
-        crop_len = int(crop_size/2)
-        x_min, x_max = x - crop_len, x + crop_size - crop_len
-        y_min, y_max = y - crop_len, y + crop_size - crop_len
+        crop_len = int(crop_size / 2)
+        x_min, x_max = row - crop_len, row + crop_size - crop_len
+        y_min, y_max = col - crop_len, col + crop_size - crop_len
 
         if (len(img.shape) == 2):
             cropped = img[int(y_min): int(y_max), int(x_min): int(x_max)]
@@ -145,27 +160,39 @@ class SHP_HANDLE(object):
         save_path = tif_handle.save_path
         tif_tran = TIF_TRANS(tif_path)
         train_out_path = os.path.join(save_path, self.via_region_data)
-        for i, geo in enumerate(self.data.geometry):
-            if i > self.samples_num:
+        pic_num = 0
+        for geo in self.data.geometry:
+            if pic_num > self.samples_num:
                 break
             row, col = tif_tran.geo2imagexy(geo.centroid.x, geo.centroid.y)
-            x_offest, y_offest = random.randint(-100, 100), random.randint(-100, 100)
-            # x_offest, y_offest = 100, 100
-            x_df, y_df = int(crop_size / 2), int(crop_size / 2)
-            x, y = int(x_df - x_offest), int(y_df - y_offest)
-            row, col = row + x_offest, col + y_offest
-            raster_name = tif_handle.tif_crop(crop_size, row, col)
+            d_random = int(0.25*crop_size)
+            x_offest, y_offest = random.randint(-d_random, d_random), random.randint(-d_random, d_random)
+            raster_name = tif_handle.tif_crop(crop_size, row, col, x_offest, y_offest)
             if raster_name == None: continue
+            x_df, y_df = int(crop_size / 2), int(crop_size / 2)
+            p_x, p_y = int(x_df - x_offest), int(y_df - y_offest)
+
             road_size = random.randint(self.road_window_size, int(self.road_window_size * 1.5))
             sample_path_name = os.path.join(save_path, raster_name)
-            sample_xyc = "{},{},{},{},{}".format(int(x - road_size / 2), int(y - road_size / 2),
-                                                 int(x + road_size / 2), int(y + road_size / 2), 0)
+            sample_xyc = "{},{},{},{},{}".format(int(p_x - road_size / 2), int(p_y - road_size / 2),
+                                                 int(p_x + road_size / 2), int(p_y + road_size / 2), 0)
             sample = "{} {}".format(sample_path_name, sample_xyc)
             self.train_samples.append(sample)
+            pic_num += 1
         with open(train_out_path, 'w') as f:
             for road_sample in self.train_samples:
                 f.writelines(road_sample)
                 f.writelines("\n")
+
+    def creaate_test_sample(self, tif_handle=TIF_HANDLE(), crop_size=CROP_SIZE):
+        tif_path = tif_handle.tif_path
+        tif_tran = TIF_TRANS(tif_path)
+        for i, geo in enumerate(self.data.geometry):
+            if i > self.samples_num:
+                break
+            row, col = tif_tran.geo2imagexy(geo.centroid.x, geo.centroid.y)
+            x_offest, y_offest = 0, 0
+            tif_handle.tif_crop(crop_size, row, col, x_offest, y_offest)
 
 
 def del_file(path_data):

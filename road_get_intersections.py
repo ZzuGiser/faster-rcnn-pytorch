@@ -28,29 +28,35 @@ except ImportError:
     import gdal
     import ogr
     import osr
+import yaml
+
 # point = geopandas.GeoDataFrame.from_file('points.shp')
 # poly  = geopandas.GeoDataFrame.from_file('multipol.shp')
 # pointInPolys = sjoin(point, poly, how='left')
 # grouped = pointInPolys.groupby('index_right')
 # list(grouped)
-DATA_PATH = '/media/two218/data/shao/data/shanghai'
-SHP_PATH = os.path.join(DATA_PATH, r'shp/shanghai_road_right.shp')
+with open('./config.yaml', 'r', encoding='utf-8') as fr:
+    cont = fr.read()
+    config_list = yaml.load(cont)
+DATA_PATH = config_list['data_path']
+SHP_PATH = os.path.join(DATA_PATH, 'shp', config_list['right_shp_name'])
 
 OUT_PACK = './result'
 OUT_NAME = 'intersection'
 OUT_PATH = os.path.join(OUT_PACK, OUT_NAME)
 CLUSTER_LEN = 0.00050
 LAYER_NAME = 'point_intersection'
-ALL_NUM = sys.maxsize
+ALL_NUM = 2000
 
 
 class GetIntersection(object):
-    def __init__(self, shp_path=SHP_PATH, outpath=OUT_PATH):
+    def __init__(self, shp_path=SHP_PATH, outpath=OUT_PATH,all_num = ALL_NUM):
         self.shp_data = gpd.read_file(shp_path)
         self.out_name = outpath
 
         self.cluster_len = CLUSTER_LEN
         self.layer_name = LAYER_NAME
+        self.all_num = all_num
 
         self.all_res_path = os.path.join(outpath, "a_intersection_lat_lon.csv")
         self.culster_csv = os.path.join(outpath, "a_intersection_lat_lon_culster.csv")
@@ -82,6 +88,7 @@ class GetIntersection(object):
         oLayer.CreateField(ogr.FieldDefn("Longitude", ogr.OFTReal))
         oLayer.CreateField(ogr.FieldDefn("shp_i_j", ogr.OFTString))
         self.handle_intersection(oLayer, oDS)
+        return os.path.join(self.out_name,'{}.shp'.format(self.layer_name))
 
     def handle_intersection(self, oLayer, oDS):
         logging.info("start handle intersection")
@@ -89,17 +96,20 @@ class GetIntersection(object):
         intersection_res = []
         for shp_i, geo_i in enumerate(geometrys[:-1]):
             logging.info("_______handle {:d} of {:d}_______".format(shp_i, len(geometrys)))
-            if shp_i > ALL_NUM:
+            if shp_i > self.all_num:
                 break
             for shp_j, geo_j in enumerate(geometrys[shp_i + 1:]):
                 if not geo_i.intersects(geo_j):
                     continue
-                line_i = [(geo_i.xy[0][k], geo_i.xy[1][k]) for k in range(len(geo_i.xy[0]))]
-                line_j = [(geo_j.xy[0][k], geo_j.xy[1][k]) for k in range(len(geo_j.xy[0]))]
-                intersection_point = self.poly_intersection(line_i, line_j)
-                if intersection_point:
-                    lat, lon, shp_i_j = intersection_point[0], intersection_point[1], "{:d}_{:d}".format(shp_i, shp_j)
-                    intersection_res.append([lat, lon, shp_i_j])
+                try:
+                    line_i = [(geo_i.xy[0][k], geo_i.xy[1][k]) for k in range(len(geo_i.xy[0]))]
+                    line_j = [(geo_j.xy[0][k], geo_j.xy[1][k]) for k in range(len(geo_j.xy[0]))]
+                    intersection_point = self.poly_intersection(line_i, line_j)
+                    if intersection_point:
+                        lat, lon, shp_i_j = intersection_point[0], intersection_point[1], "{:d}_{:d}".format(shp_i, shp_j)
+                        intersection_res.append([lat, lon, shp_i_j])
+                except Exception as e:
+                    logging.info(e)
 
         res_data_frame = pd.DataFrame(intersection_res, columns=['lat', 'lon', 'shp_i_j'])
         res_data_frame.to_csv(self.all_res_path)
@@ -215,5 +225,3 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     intersection_generate = GetIntersection(outpath=output_path)
     intersection_generate.get_intersection()
-
-
