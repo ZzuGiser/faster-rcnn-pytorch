@@ -32,7 +32,7 @@ TRAIN_NAME = r'train_road_faster_rcnn'
 TRAIN_PATH = os.path.join(CUR_PATH, TRAIN_NAME)
 
 CROP_SIZE = 200
-ROAD_WINDOW_SIZE = 50
+ROAD_WINDOW_SIZE = int(0.25*CROP_SIZE)
 VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
 IMAGE_NUM = 0
 ALL_IMAGE_NUM = 2000
@@ -146,16 +146,16 @@ class TIF_HANDLE(object):
 
 
 class SHP_HANDLE(object):
-    def __init__(self, shp_path=SHP_PATH, via_region_data=VIA_REGION_DATA, road_window_size=ROAD_WINDOW_SIZE,
+    def __init__(self, shp_path=SHP_PATH, via_region_data=VIA_REGION_DATA,
                  samples_num=ALL_IMAGE_NUM):
         self.shp_path = shp_path
         self.data = gpd.read_file(shp_path)
         self.via_region_data = via_region_data
         self.train_samples = []
         self.samples_num = samples_num
-        self.road_window_size = road_window_size
 
     def creaate_train_sample(self, tif_handle=TIF_HANDLE(), crop_size=CROP_SIZE):
+        road_window_size = int(0.25*crop_size)
         tif_path = tif_handle.tif_path
         save_path = tif_handle.save_path
         tif_tran = TIF_TRANS(tif_path)
@@ -172,7 +172,7 @@ class SHP_HANDLE(object):
             x_df, y_df = int(crop_size / 2), int(crop_size / 2)
             p_x, p_y = int(x_df - x_offest), int(y_df - y_offest)
 
-            road_size = random.randint(self.road_window_size, int(self.road_window_size * 1.5))
+            road_size = random.randint(road_window_size, int(road_window_size * 1.5))
             sample_path_name = os.path.join(save_path, raster_name)
             sample_xyc = "{},{},{},{},{}".format(int(p_x - road_size / 2), int(p_y - road_size / 2),
                                                  int(p_x + road_size / 2), int(p_y + road_size / 2), 0)

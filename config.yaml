@@ -3,13 +3,17 @@ shp_name: 'road.shp'
 right_shp_name : 'road_right.shp'
 ponint_shp_name : 'point_intersection.shp'
 img_name: 'raster.tif'
-point_num: 1000
-out_path: 'H:/result/shanghai100'
+point_num: 200
+out_path: 'H:/result/guangzhou200_1'
+
+road_sample:
+  crop_size: 400
 
 road_verify :
   root_dir : './'
   images_pack : 'road_images'
-  output_name : 'result'
+  model_path: 'model_data/road_voc_weights_resnet.pth'
+
 
 frcnn:
   model_path: 'model_data/road_voc_weights_resnet.pth'

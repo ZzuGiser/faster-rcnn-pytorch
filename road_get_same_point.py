@@ -15,6 +15,8 @@ if __name__ == "__main__":
     SHP_PATH = os.path.join(DATA_PATH, 'shp', config_list['shp_name'])
     POINT_NUM = config_list['point_num']
     out_path = config_list['out_path']
+    MODEL_PATH = config_list['road_verify']['model_path']
+    CROP_SIZE = config_list['road_sample']['crop_size']
 
     logging.basicConfig(level=logging.INFO)
     intersection_output_pack = '{:%Y%m%d_%H%M}_intersection_to_shp'.format(datetime.datetime.now())
@@ -30,11 +32,11 @@ if __name__ == "__main__":
         os.makedirs(intersection_pic_path)
     tif_handle = TIF_HANDLE(path=TIF_PATH, save_path=os.path.abspath(intersection_pic_path))
     shp_handle = SHP_HANDLE(shp_path=road_point_path, samples_num=POINT_NUM)
-    shp_handle.creaate_test_sample(tif_handle=tif_handle)
+    shp_handle.creaate_test_sample(tif_handle=tif_handle,crop_size=CROP_SIZE)
 
     output_pack = '{:%Y%m%d_%H%M}_road_verify'.format(datetime.datetime.now())
     road_verify_output_path = os.path.join(out_path, output_pack)
     if not os.path.exists(road_verify_output_path):
         os.makedirs(road_verify_output_path)
-    patch_veriry = Patch_Verify(images_path=intersection_pic_path, output_path=road_verify_output_path)
+    patch_veriry = Patch_Verify(images_path=intersection_pic_path, output_path=road_verify_output_path,model_path=MODEL_PATH)
     patch_veriry.do_detech_roads()

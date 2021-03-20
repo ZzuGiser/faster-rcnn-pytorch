@@ -39,7 +39,7 @@ with open('./config.yaml', 'r', encoding='utf-8') as fr:
     cont = fr.read()
     config_list = yaml.load(cont)
 DATA_PATH = config_list['data_path']
-SHP_PATH = os.path.join(DATA_PATH, 'shp', config_list['right_shp_name'])
+SHP_PATH = os.path.join(DATA_PATH, 'shp', config_list['shp_name'])
 
 OUT_PACK = './result'
 OUT_NAME = 'intersection'
@@ -217,11 +217,13 @@ if __name__ == '__main__':
     #         intersection_generate = GetIntersection(shp_path=shp_path, outpath=output_path)
     #         intersection_generate.layer_name = layer_name
     #         intersection_generate.get_intersection()
+    SHP_PATH = 'H:/广州市/shp/road.shp'
+    ALL_NUM = 20000
 
     output_pack = '{:%Y%m%d_%H%M}_intersection_to_shp'.format(datetime.datetime.now())
     output_path = os.path.join(OUT_PACK, output_pack)
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     logging.basicConfig(level=logging.INFO)
-    intersection_generate = GetIntersection(outpath=output_path)
+    intersection_generate = GetIntersection(outpath=output_path,shp_path=SHP_PATH,all_num=ALL_NUM)
     intersection_generate.get_intersection()

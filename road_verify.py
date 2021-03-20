@@ -21,6 +21,7 @@ from road_sample_faster_rcnn import TIF_TRANS
 from road_frcnn import FRCNN
 from PIL import Image
 import yaml
+
 with open('./config.yaml', 'r', encoding='utf-8') as fr:
     cont = fr.read()
     config_list = yaml.load(cont)
@@ -30,21 +31,21 @@ ROOT_DIR = config_list['road_verify']['root_dir']
 sys.path.append(ROOT_DIR)  # To find local version of the library
 
 IMAGE_PATH = os.path.join(ROOT_DIR, config_list['road_verify']['images_pack'])
-OUTPUT_PATH = os.path.join(ROOT_DIR, config_list['road_verify']['output_name'])
-
-
+OUTPUT_PATH = config_list['out_path']
+MODEL_PATH = config_list['road_verify']['model_path']
 
 
 class Patch_Verify(object):
-    def __init__(self, images_path=IMAGE_PATH, output_path=OUTPUT_PATH):
+    def __init__(self, images_path=IMAGE_PATH, output_path=OUTPUT_PATH, model_path=MODEL_PATH):
         self.images_path = images_path
         self.ouput_path = output_path
         self.all_patch_res_path = os.path.join(output_path, 'a_all_patch_res.csv')
         self.filter_patch_res_path = os.path.join(output_path, 'a_filter_patch_res.csv')
         self.culster_png = os.path.join(output_path, 'a_Clustering.png')
         self.culster_csv = os.path.join(output_path, 'a_Clustering.csv')
-        self.culster_txt = os.path.join(output_path,'a_same_point.txt')
+        self.culster_txt = os.path.join(output_path, 'a_same_point.txt')
         self.fcnn = FRCNN()
+        self.fcnn.model_path = model_path
 
     def center_point(self, points, r_x, r_y):
         '''center_point 计算提取坐标的实际坐标的差值 '''
@@ -79,10 +80,10 @@ class Patch_Verify(object):
             #     image = image[:, :, np.newaxis]
             #     image = np.concatenate((image, image, image), axis=2)
             w, h = image.height, image.width  # w = 400,h = 400
-            results = self.fcnn.batch_detect_image(image,self.ouput_path,image_name)
+            results = self.fcnn.batch_detect_image(image, self.ouput_path, image_name)
             # Visualize results
             m = re.match(r'(\d+)_(\d+)_(\d+)_(\d+)_(\d+).jpg', image_name)
-            row_point, col_point,real_x,real_y = int(m.group(2)), int(m.group(3)),int(m.group(4)), int(m.group(5))
+            row_point, col_point, real_x, real_y = int(m.group(2)), int(m.group(3)), int(m.group(4)), int(m.group(5))
             dis, offset_xy = self.center_point(results, real_x, real_y)
 
             x_before, y_before = tif_tans.imagexy2geo(col_point, row_point)
@@ -126,7 +127,9 @@ class Patch_Verify(object):
 
 if __name__ == '__main__':
 
-    images_path = IMAGE_PATH
+    images_path = './road_images'
+    OUTPUT_PATH = './result'
+    model_path = 'model_data/road_voc_weights_resnet.pth'
     output_pack = '{:%Y%m%d_%H%M}_road_verify'.format(datetime.datetime.now())
     output_path = os.path.join(OUTPUT_PATH, output_pack)
     if not os.path.exists(output_path):
