@@ -26,7 +26,7 @@ class FRCNN(object):
         "model_path"    : 'model_data/road_voc_weights_resnet.pth',
         "classes_path"  : 'model_data/road_voc_classes.txt',
         "confidence"    : 0.9,
-        "iou"           : 0.7,
+        "iou"           : 0.1,
         "backbone"      : "resnet50",
         "cuda"          : True,
     }

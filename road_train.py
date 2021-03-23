@@ -10,7 +10,8 @@ import torch.backends.cudnn as cudnn
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from utils.dataloader import FRCNNDataset, frcnn_dataset_collate
-
+import pandas as pd
+DATA_LOSS = []
 
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
@@ -85,6 +86,7 @@ def fit_ont_epoch(net, epoch, epoch_size, epoch_size_val, gen, genval, Epoch, cu
     print('Saving state, iter:', str(epoch + 1))
     torch.save(model.state_dict(), 'logs/Epoch%d-Total_Loss%.4f-Val_Loss%.4f.pth' % (
     (epoch + 1), total_loss / (epoch_size + 1), val_toal_loss / (epoch_size_val + 1)))
+    DATA_LOSS.append([float('%.4f' % (total_loss / (epoch_size + 1))), float('%.4f' % (val_toal_loss / (epoch_size + 1)))])
 
 
 if __name__ == "__main__":
@@ -203,3 +205,7 @@ if __name__ == "__main__":
         for epoch in range(Freeze_Epoch, Unfreeze_Epoch):
             fit_ont_epoch(net, epoch, epoch_size, epoch_size_val, gen, gen_val, Unfreeze_Epoch, Cuda)
             lr_scheduler.step()
+
+    loss_data_frame = pd.DataFrame(DATA_LOSS, columns=['total_loss', 'val_loss'])
+    loss_data_frame.to_csv('./logs/data_loss.csv')
+

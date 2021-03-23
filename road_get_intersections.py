@@ -181,7 +181,7 @@ class GetIntersection(object):
         # 若通过快速排斥则进行跨立实验
         if (cross(line1[0], line1[1], line2[0]) * cross(line1[0], line1[1], line2[1]) <= 0
             and cross(line2[0], line2[1], line1[0]) * cross(line2[0], line2[1], line1[1]) <= 0) \
-                and self.get_cross_angle(line1, line2) > (60 / np.pi):
+                and  self.get_cross_angle(line1, line2) > (60 / np.pi):
             d = (det(*line1), det(*line2))
             x = det(d, xdiff) / div
             y = det(d, ydiff) / div
@@ -217,10 +217,10 @@ if __name__ == '__main__':
     #         intersection_generate = GetIntersection(shp_path=shp_path, outpath=output_path)
     #         intersection_generate.layer_name = layer_name
     #         intersection_generate.get_intersection()
-    SHP_PATH = 'H:/广州市/shp/road.shp'
+    SHP_PATH = 'H:/广州市/shp/road_right.shp'
     ALL_NUM = 20000
-
-    output_pack = '{:%Y%m%d_%H%M}_intersection_to_shp'.format(datetime.datetime.now())
+    OUT_PACK = 'H:/result'
+    output_pack = '{:%Y%m%d_%H%M}_intersection_to_shp_60-120'.format(datetime.datetime.now())
     output_path = os.path.join(OUT_PACK, output_pack)
     if not os.path.exists(output_path):
         os.makedirs(output_path)

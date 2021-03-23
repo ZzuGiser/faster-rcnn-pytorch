@@ -1,10 +1,10 @@
-data_path : 'H:/广州市'
+data_path : 'H:/南昌市'
 shp_name: 'road.shp'
 right_shp_name : 'road_right.shp'
 ponint_shp_name : 'point_intersection.shp'
 img_name: 'raster.tif'
-point_num: 200
-out_path: 'H:/result/guangzhou200_1'
+point_num: 100
+out_path: 'H:/result/nanchang100'
 
 road_sample:
   crop_size: 400

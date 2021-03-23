@@ -32,7 +32,7 @@ TRAIN_NAME = r'train_road_faster_rcnn'
 TRAIN_PATH = os.path.join(CUR_PATH, TRAIN_NAME)
 
 CROP_SIZE = 200
-ROAD_WINDOW_SIZE = int(0.25*CROP_SIZE)
+road = int(0.25*CROP_SIZE)
 VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
 IMAGE_NUM = 0
 ALL_IMAGE_NUM = 2000
@@ -172,7 +172,7 @@ class SHP_HANDLE(object):
             x_df, y_df = int(crop_size / 2), int(crop_size / 2)
             p_x, p_y = int(x_df - x_offest), int(y_df - y_offest)
 
-            road_size = random.randint(road_window_size, int(road_window_size * 1.5))
+            road_size = random.randint(int(road_window_size * 1.2), int(road_window_size * 1.6))
             sample_path_name = os.path.join(save_path, raster_name)
             sample_xyc = "{},{},{},{},{}".format(int(p_x - road_size / 2), int(p_y - road_size / 2),
                                                  int(p_x + road_size / 2), int(p_y + road_size / 2), 0)
@@ -206,9 +206,18 @@ def del_file(path_data):
 
 if __name__ == '__main__':
     # 将影像按照矢量道路交叉口点进行裁剪，自动生成训练集
+
+    SHP_PATH = 'H:/广州市/shp/point_intersection.shp'
+    TIF_PATH = 'H:/广州市/img/raster.tif'
+    TRAIN_PATH = './train_road_faster_rcnn'
+
+    CROP_SIZE = 400
+    road = int(0.25 * CROP_SIZE)
+    VIA_REGION_DATA = 'faster_rcnn_road_sample.txt'
+    IMAGE_NUM = 0
+    ALL_IMAGE_NUM = 1000
     logging.basicConfig(level=logging.INFO)
     tif_handle = TIF_HANDLE(path=TIF_PATH, save_path=os.path.abspath(TRAIN_PATH))
-    road_window_size = ROAD_WINDOW_SIZE
     if TRAIN_NAME in os.listdir(CUR_PATH):
         del_file(TRAIN_PATH)
     else:

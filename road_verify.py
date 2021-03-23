@@ -27,12 +27,14 @@ with open('./config.yaml', 'r', encoding='utf-8') as fr:
     config_list = yaml.load(cont)
 
 # Root directory of the project
-ROOT_DIR = config_list['road_verify']['root_dir']
-sys.path.append(ROOT_DIR)  # To find local version of the library
-
-IMAGE_PATH = os.path.join(ROOT_DIR, config_list['road_verify']['images_pack'])
-OUTPUT_PATH = config_list['out_path']
-MODEL_PATH = config_list['road_verify']['model_path']
+try:
+    ROOT_DIR = config_list['road_verify']['root_dir']
+    sys.path.append(ROOT_DIR)  # To find local version of the library
+    IMAGE_PATH = os.path.join(ROOT_DIR, config_list['road_verify']['images_pack'])
+    OUTPUT_PATH = config_list['out_path']
+    MODEL_PATH = config_list['road_verify']['model_path']
+except Exception as e:
+    print(e)
 
 
 class Patch_Verify(object):
@@ -127,11 +129,18 @@ class Patch_Verify(object):
 
 if __name__ == '__main__':
 
+    # ROOT_DIR = config_list['road_verify']['root_dir']
+    # sys.path.append(ROOT_DIR)  # To find local version of the library
+    #
+    # IMAGE_PATH = os.path.join(ROOT_DIR, config_list['road_verify']['images_pack'])
+    # # OUTPUT_PATH = config_list['out_path']
+    # MODEL_PATH = config_list['road_verify']['model_path']
+
     images_path = './road_images'
-    OUTPUT_PATH = './result'
+    output_path = './result'
     model_path = 'model_data/road_voc_weights_resnet.pth'
     output_pack = '{:%Y%m%d_%H%M}_road_verify'.format(datetime.datetime.now())
-    output_path = os.path.join(OUTPUT_PATH, output_pack)
+    output_path = os.path.join(output_path, output_pack)
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     logging.basicConfig(level=logging.INFO,
@@ -139,7 +148,7 @@ if __name__ == '__main__':
                         datefmt='%a, %d %b %Y %H:%M:%S',
                         filename=os.path.join(output_path, 'a_reslut.log'),
                         filemode='w')
-    patch_veriry = Patch_Verify(images_path=images_path, output_path=output_path)
+    patch_veriry = Patch_Verify(images_path=images_path, output_path=output_path,model_path=model_path)
     patch_veriry.do_detech_roads()
 
     # path =r'D:\360download\code_targetdetection\mask_rcnn_road\road_sample\result\20201105_1107_road_verify\a_all_patch_res.csv'
