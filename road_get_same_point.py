@@ -14,7 +14,8 @@ if __name__ == "__main__":
     TIF_PATH = os.path.join(DATA_PATH, 'img', config_list['img_name'])
     SHP_PATH = os.path.join(DATA_PATH, 'shp', config_list['shp_name'])
     POINT_NUM = config_list['point_num']
-    out_path = config_list['out_path']
+    pack_name = '{:%Y%m%d_%H%M}_{}_{}'.format(datetime.datetime.now(), DATA_PATH.split('/')[-1], POINT_NUM)
+    out_path = os.path.join(config_list['out_path'], pack_name)
     MODEL_PATH = config_list['road_verify']['model_path']
     CROP_SIZE = config_list['road_sample']['crop_size']
 
